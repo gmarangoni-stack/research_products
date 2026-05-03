@@ -1,0 +1,90 @@
+---
+title: "Student Performance Analysis"
+author: "Gustavo Marangoni"
+format:
+  pdf:
+    fig-width: 9
+    fig-height: 6
+execute:
+  echo: false
+  eval: true
+  warning: false
+  message: false
+---
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(ggplot2)
+library(patchwork)
+library(haven)
+library(knitr)
+
+student <- read.csv("C:/Users/gugau/OneDrive/Área de Trabalho/Data Analysis/Problem Sets/PS2/StudentPerformanceFactors.csv")
+
+outliersh <- 
+  student |> 
+  filter(Exam_Score > 90)
+
+plotstud <- 
+  student |> 
+  ggplot(aes(x = Hours_Studied, y = Exam_Score)) + 
+  geom_point(alpha = 1) +
+  geom_smooth(se = FALSE) +
+  geom_point(data = outliersh, color = "red") +
+  geom_point(
+    data = outliersh, 
+    color = "red", size = 3, shape = "circle open"
+  ) +
+  geom_point() +
+  geom_hline(yintercept=90) +
+  labs(
+    x = "Hours Studied per Week",
+    y = "Exam Score",
+    title = '"A" Students are Not Always the Most Studious',
+    subtitle = 'More Than Half of High-Performing Students Spend Less Than 25 Hours Studying per Week', 
+    caption = "Source = Student Academic Performance Dataset"
+  ) +
+  scale_x_continuous(
+    limits = c(0, 40),
+    breaks = seq(0, 40, 5),
+    minor_breaks = NULL,
+    expand = expansion(mult = c(0, 0))
+  ) +
+  scale_y_continuous(
+    limits = c(50, 110),
+    breaks = seq(50, 105, 5),
+    minor_breaks = NULL,
+    labels = function(x) ifelse(x == 90, paste0(x, " (A)"), x),
+    expand = expansion(mult = c(0, 0))
+  ) +
+  theme_light(base_size = 12) +
+  theme(
+    plot.title = element_text(face = 'bold', hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    plot.caption = element_text(hjust = 0),
+    plot.margin = margin(5, 50, 5, 5),
+    plot.background = element_rect(color = "black"))
+
+```
+# How strongly do hours studied predict exam performance? 
+
+## Methodology
+
+I used the “Student Academic Performance Dataset” to analyze the relationship between hours studied and exam performance. The dataset contains 6607 student responses distributed across 20 different variables. The exam score distribution ranged from 55 to 101, while the hours studied ranged from 1 to 44.
+
+```{r}
+plotstud
+```    
+
+## Analysis
+One thing that is clear by analyzing the graph is that high-performing students do not always have extreme hours of study, but instead study a moderate amount. Even though we commonly correlate “A” Students being the most studious, the dataset revealed that the majority of these students study less than 25 hours per week and still get the highest grades. This is not suggesting that studying is useless, especially given that the linear fit (blue line) reveals that there is a moderate positive correlation between studying and scoring higher in their exams. However, given the moderate steepness in the trend line, increasing hours of study alone does not guarantee exceptional performance in exams. 
+
+As seen in the red-circle points, these outliers tend to study between 10-30 hours per week while getting scores above 90% on their exams. In fact, within these high-scoring individuals, the median exam score is 95.5 whereas the median study time is 22 hours per week. This suggests that exceptionally high scores are not limited to extreme study hours, especially since many top-performing students are concentrated around moderate study levels. There is an exception, where one student scored a 92 with one hour of study time, but they are an exception to our total observations. What all of these top-performing outliers may be suggesting, however, is that there might be other factors that more directly can predict high scores in exams. For instance, the dataset contained variables like attendance, access to resources, teacher quality, sleep quality, and parental involvement, which could also influence performance in a more significant way than just study time. 
+
+## Conclusion
+
+Overall, I believe this is a lesson that education does not only require study time to become a high-performing individual, but it involves several aspects that, when combined together in an effective manner, it can significantly determine higher scores in exam performance.  In light of the above, it is clear that study time matters, but high achievement also relies on an interaction of other factors within the students’ life and educational system. 
+
+
