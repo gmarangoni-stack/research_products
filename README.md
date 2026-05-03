@@ -1,5 +1,7 @@
 # research_products
-Two original research products I elaborated for my Data Analysis class
+In this repository, I have included two original research products I elaborated for my Data Analysis class.
+You may find the end products, the methodology, the reproducible code, and the replication files.
+The instructions for each product are down below:
 
 ## Slide Deck (index.pdf)
 For this assignment, I had the following instructions:
