@@ -4,7 +4,7 @@ You may find the end products, the methodology, the reproducible code, and the r
 The instructions for each product are down below:
 
 ## Slide Deck (index.pdf)
-For this assignment, I had the following instructions:
+### For this assignment, I had the following instructions:
 
 **Show off your data analytic research skills** 
 - Design and complete a mini original research project with either a short paper or a slide deck as your primary deliverable. 
@@ -31,11 +31,12 @@ This should be a professional product in both form and substance
 Someone who encounters it should see that you took care in preparing it and should
 be able to learn something concrete from your analytic insights
 
+### Methodology
 The data used was extracted directly from the  Latinobarómetro data publication for the 2023 wave.
 You may access the data in the following link: https://www.latinobarometro.org/latinobarometro-2023
 The data and codebook are also included in the repository.
 
-Overall, this study aimed to analyze the question: 
+This study aimed to analyze the question: 
 "To what extent does partisanship and presidential approval shape the view of the
 Brazilian population towards Foreign Policy, specifically in attitudes towards
 United States and China?*"
@@ -62,7 +63,8 @@ relation to the upcoming presidential elections in October 2026
 
 
 ## Report (student_performance)
-For this assignment, I had the following instructions:
+### For this assignment, I had the following instructions:
+
 Teach me something using a dataset of interest to you. Find a dataset, and present a combi-
 nation of text (300-500 words), visualization, and relevant statistics that tell a coherent story.
 
@@ -70,12 +72,14 @@ The visual should be excellent. The text should be a sharp explanation of the da
 sure(s), and the conclusion. A good answer will teach me something as a reader. It will have
 a main point, and the visual, prose, and stats will work together to make that point.
 
-The data extracted was from the Student Performance Dataset, in kaggle. The link to the dataset
-can be accessed through the following link: https://www.kaggle.com/datasets/kundanbedmutha/student-performance-dataset.
-The data can also be found in the repository.
+### Methodology
 
 The research topic for this was the relationship between hours studied and exam performance in students. 
-I examined the relationship to determine if "A"" students are relatively the more studious or not. 
+I examined the relationship to determine if "A"" students are relatively the more studious or not.
+
+The data extracted was from the Student Performance Dataset, in kaggle. The link to the dataset
+can be accessed through the following link: https://www.kaggle.com/datasets/kundanbedmutha/student-performance-dataset.
+The data can also be found in the repository. 
 
 My approach was to create a plot and include diverse responses in the graph as different 
 points and analyze the amount of hours that "A" students dedicated to studying. Also, 
