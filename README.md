@@ -62,7 +62,7 @@ The slides have the data, methodology, analysis, and overall conclusion in
 relation to the upcoming presidential elections in October 2026
 
 
-## Report (student_performance)
+## Report (student_performance.pdf)
 ### For this assignment, I had the following instructions:
 
 Teach me something using a dataset of interest to you. Find a dataset, and present a combi-
