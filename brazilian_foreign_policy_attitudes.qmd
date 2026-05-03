@@ -1,0 +1,559 @@
+---
+title: "Attitudes of Brazilian Voters on the United States and China"
+subtitle: "How Partisanship and Presidential Approval Shape View of Foreign Policy"
+author: "Gustavo Marangoni"
+format: 
+  beamer:
+    theme: Madrid
+    colortheme: crane
+    aspectratio: 32
+knitr:
+  opts_chunk:
+    echo: false
+    eval: true
+    prompt: false
+    tidy: false
+    comment: NA
+    message: FALSE
+    warning: FALSE
+    fig.align: 'center'
+---
+
+```{r}
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(knitr)
+library(haven)
+
+df <- readxl::read_xlsx("C:/Users/gugau/OneDrive/Área de Trabalho/Data Analysis/Problem Sets/PS4/F00018444-Latinobarometro_2023_Brazil_ExcelText_eng_v1.xlsx")
+
+brazil <- df |> 
+  select(
+    `EDAD: Age`,
+    `SEXO: Sex`,
+    `REEEDUC.1: REEDUC 1`,
+    `S2: People sometimes describe themselves as belonging to a social class. Would you describe yourself as belonging to`,
+    `P15STGBS: Approval of the management of the government led by the President`,
+    `P16ST: Self-positioning on Left-Right scale`,
+    `P12ST: {COUNTRY} ruled by a few powerful groups for their own benefit or for the good of all the people`,
+    `P23ST.A: Opinion about the United States`,
+    `P23ST.C: Opinion about the China`,
+    `P24ST.A: Rating of the relationship between the country and the United States.`,
+    `P24ST.C: Rating of the relationship between the country and the China`,
+    `P25N.A: Rating of the economic relations between the country and the United States`,
+    `P25N.C: Rating of the economic relations between the country and China`,
+    `P27SDN: {COUNTRY} should have a closer relationship with the United States or China`,
+    `P43STGBS.A: If elections were this Sunday, which party would you vote for`,
+    `P43STGBS.B: For coding only`,
+  ) |> 
+  rename(
+    age            = `EDAD: Age`,
+    sex            = `SEXO: Sex`,
+    education      = `REEEDUC.1: REEDUC 1`,
+    social_class   = `S2: People sometimes describe themselves as belonging to a social class. Would you describe yourself as belonging to`,
+    pres_approval  = `P15STGBS: Approval of the management of the government led by the President`,
+    ideology       = `P16ST: Self-positioning on Left-Right scale`,
+    gov_perception = `P12ST: {COUNTRY} ruled by a few powerful groups for their own benefit or for the good of all the people`,
+    favor_us       = `P23ST.A: Opinion about the United States`,
+    favor_china    = `P23ST.C: Opinion about the China`,
+    polrel_us      = `P24ST.A: Rating of the relationship between the country and the United States.`,
+    polrel_china   = `P24ST.C: Rating of the relationship between the country and the China`,
+    econrel_us     = `P25N.A: Rating of the economic relations between the country and the United States`,
+    econrel_china  = `P25N.C: Rating of the economic relations between the country and China`,
+    closer_to      = `P27SDN: {COUNTRY} should have a closer relationship with the United States or China`,
+    party_vote     = `P43STGBS.A: If elections were this Sunday, which party would you vote for`,
+    party          = `P43STGBS.B: For coding only`
+  ) |> 
+  filter(age >= 18) |> 
+  mutate(
+    favor_us1 = fct_relevel(
+      favor_us, 
+      "Very unfavorable", 
+      "Somewhat unfavorable", 
+      "Don't know",
+      "Does not answer",
+      "Somewhat favorable",
+      "Very favorable"
+    ),
+    favor_china1 = fct_relevel(
+      favor_china, 
+      "Very unfavorable", 
+      "Somewhat unfavorable", 
+      "Somewhat favorable",
+      "Very favorable"
+    ),
+    econrel_us1 = fct_relevel(
+      econrel_us,
+      "Very poor",
+      "Fairly poor",
+      "Fairly good",
+      "Very good"
+  ),
+  econrel_china1 = fct_relevel(
+      econrel_china,
+      "Very poor",
+      "Fairly poor",
+      "Fairly good",
+      "Very good"
+  ),
+  polrel_us1 = fct_relevel(
+    polrel_us,
+    "Very poor",
+    "Fairly poor",
+    "Fairly good",
+    "Very good"
+  ),
+  polrel_china1 = fct_relevel(
+    polrel_china,
+    "Very poor",
+    "Fairly poor",
+    "Fairly good",
+    "Very good"
+  ),
+   closer_to1 = fct_relevel(
+     closer_to, 
+     "Neither (if volunteered)",
+     "Both (if volunteered)",
+     "China",
+     "United States"
+   ),
+  closer_to1 = fct_recode(
+    closer_to1,
+    "Neither" = "Neither (if volunteered)",
+    "Both" = "Both (if volunteered)"
+  ),
+  party1 = case_when(
+      party == "Voted government party"  ~ "Government",
+      party == "Voted oppisition party" ~ "Opposition",
+      TRUE ~ NA_character_
+    )
+  )
+
+#Write a Function for Graphs for Categorical Variables (From PS3)
+plot_us <- function(data, grouping, y_var){
+  require(ggplot2)
+  require(patchwork)
+  require(dplyr)
+  
+  us_colors <- c("#002147", "#003F8A", "#0A5EB0", "#4A90D9", "#AEC6E8")
+  
+  plot <- 
+    data |> 
+    select({{ grouping }}, {{ y_var }}) |>
+    filter(!{{ grouping }} %in% c("Don't know", "Does not answer", 
+                                   "No answer", "DNK", "NA")) |>
+    group_by({{ grouping }}) |> 
+    mutate({{ grouping }} := as.factor({{ grouping }})) |> 
+    ggplot(aes(x = {{ grouping }}, y = {{ y_var }})) +
+    geom_col(aes(fill = {{ grouping }})) +
+    scale_fill_manual(values = us_colors) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+    labs(caption = "Source: Latinobarómetro 2023") +
+    theme_light() +
+    theme(
+      plot.title = element_text(
+        size = 20,
+        face = "bold",
+        hjust = 0.5,
+        color = "#002776"),
+      plot.tag = element_text(
+        face = "bold",
+        size = 11,
+        hjust = 1,
+        vjust = 0,
+        color = "#002776"),
+      plot.tag.position = c(1, -0.05),
+      plot.margin = margin(t = 10, r = 10, b = 100, l = 10),
+      legend.position = "none",
+      plot.subtitle = element_text(size = 12, color = "gray50"),
+      panel.grid.major.y = element_line(color = "gray90"),
+      panel.grid.major.x = element_blank(),
+      axis.line = element_line(color = "#002776"),
+      axis.text = element_text(color = "#002776", size = 11),
+      axis.title = element_text(
+        color = "#002776",
+        face = "bold",
+        size = 13),
+      strip.background = element_rect(fill = "#002776"),
+      strip.text = element_text(
+        color = "white",
+        face = "bold",
+        size = 11)
+    )
+  
+  return(plot)
+}
+
+plot_china <- function(data, grouping, y_var){
+  require(ggplot2)
+  require(patchwork)
+  require(dplyr)
+  
+  china_colors <- c("#4B0000", "#8B0000", "#C0392B", "#E74C3C", "#F1948A")
+  
+  plot <- 
+    data |> 
+    select({{ grouping }}, {{ y_var }}) |>
+    filter(!{{ grouping }} %in% c("Don't know", "Does not answer", 
+                                   "No answer", "DNK", "NA")) |>
+    group_by({{ grouping }}) |> 
+    mutate({{ grouping }} := as.factor({{ grouping }})) |> 
+    ggplot(aes(x = {{ grouping }}, y = {{ y_var }})) +
+    geom_col(aes(fill = {{ grouping }})) +
+    scale_fill_manual(values = china_colors) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+    labs(caption = "Source: Latinobarómetro 2023") +
+    theme_light() +
+    theme(
+      plot.title = element_text(
+        size = 20,
+        face = "bold",
+        hjust = 0.5,
+        color = "#8B0000"),
+      plot.tag = element_text(
+        face = "bold",
+        size = 11,
+        hjust = 1,
+        vjust = 0,
+        color = "#8B0000"),
+      plot.tag.position = c(1, -0.05),
+      plot.margin = margin(t = 10, r = 10, b = 100, l = 10),
+      legend.position = "none",
+      plot.subtitle = element_text(size = 12, color = "gray50"),
+      panel.grid.major.y = element_line(color = "gray90"),
+      panel.grid.major.x = element_blank(),
+      axis.line = element_line(color = "#8B0000"),
+      axis.text = element_text(color = "#8B0000", size = 11),
+      axis.title = element_text(
+        color = "#8B0000",
+        face = "bold",
+        size = 13),
+      strip.background = element_rect(fill = "#8B0000"),
+      strip.text = element_text(
+        color = "white",
+        face = "bold",
+        size = 11)
+    )
+  
+  return(plot)
+}
+```
+
+# **Overview**
+- During Lula Inácio da Silva's administration, Brazil has deepened political and economic relationships with China, especially through the BRICS forum. 
+
+- This is a contrast from Jair Bolsonaro's administration, who was openly allied to the United States and the Trump administration. 
+
+- Given the upcoming **October presidential elections** and that both presidents represent different political parties and ideologies in Brazil, this study uses the Latinobarómetro to answer the question: 
+
+### *To what extent does partisanship and presidential approval shape the view of the Brazilian population towards Foreign Policy, specifically in attitudes towards United States and China?*
+
+# **Data and Methodology**
+*Source: Latinobarómetro 2023 (During Lula's Administration)*
+
+### Questions:
+- Presidential approval
+- U.S. and China favorability 
+- Political and economic relations with U.S. and China 
+- Great power preference 
+- Vote intention / party alignment 
+
+# **General Views Towards the United States**
+```{r}
+plot_us1 <- brazil |> 
+  filter(!is.na(favor_us1)) |> 
+  count(favor_us1) |> 
+  plot_us(favor_us1, n) +
+  labs(
+    x = "Opinion of the United States",
+    y = "Number of Respondents",
+    title = "Brazilian Opinion of the United States"
+    ) 
+
+#| echo: true
+plot_us1
+```
+
+# **General Views Towards China**
+```{r}
+plot_china1 <- brazil |> 
+  filter(!is.na(favor_china1)) |> 
+  count(favor_china1) |> 
+  plot_china(favor_china1, n) +
+   labs(
+    x = "Opinion of China",
+    y = "Number of Respondents",
+    title = "Brazilian Opinion of China"
+    )
+
+#|echo: true
+plot_china1
+```
+
+# **Economic and Political Relations Towards the U.S.**
+```{r}
+ploteconrel_us <- brazil |> 
+  filter(!is.na(econrel_us1)) |> 
+  count(econrel_us1) |> 
+  plot_us(econrel_us1, n) +
+  labs(
+    x = "Economic Relationship",
+    y = "Number of Respondents"
+    )
+
+polrel_usbrazil <- brazil |> 
+  filter(!is.na(polrel_us1)) |> 
+  count(polrel_us1) |> 
+  plot_us(polrel_us1, n) +
+  labs(
+    x = "Political Relationship",
+    y = "Number of Respondents"
+    )
+
+#|echo: true
+ploteconrel_us + polrel_usbrazil +
+  labs(
+    title = "View on Economic and Political Relationship with the United States"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 1)
+  )
+```
+
+# **Economic and Political Relations Towards China**
+```{r}
+ploteconrel_china <- brazil |> 
+  filter(!is.na(econrel_china1)) |> 
+  count(econrel_china1) |> 
+  plot_china(econrel_china1, n) +
+  labs(
+    x = "Economic Relationship",
+    y = "Number of Respondents"
+    )
+
+polrel_china <- brazil |> 
+  filter(!is.na(polrel_china1)) |> 
+  count(polrel_china1) |> 
+  plot_china(polrel_china1, n) +
+  labs(
+    x = "Political Relationship",
+    y = "Number of Respondents"
+    )
+
+#|echo: true
+ploteconrel_china + polrel_china +
+  labs(
+    title = "View on Economic and Political Relationship with China"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 1.3)
+  )
+```
+
+# **What are the Takeaways from These Graphs so far?**
+
+Based on the plots analyzing favorability between the Great Powers, it seems that Brazilians tend to have a somewhat favorable view of the United States without accounting for partisanship. 
+
+In contrast, when considering China, Brazilians tend to have a more unfavorable view than with the United States, but there is still some level of favorability towards the country as well. 
+
+### In matters of political and economic relationships, there are two takeaways:
+- Respondents tend to correlate political and economic relationships, making their answers fairly similar on both categories
+- Most respondents have the impression that political and economic relationships with both countries are fairly good
+
+> ***What happens when we account for partisanship?***
+
+# **Partisanship and Foreign Policy Preferences in Brazil**
+```{r}
+#| fig.width: 14
+#| fig.height: 8
+plot_party_us <- brazil |>
+  filter(!is.na(party1), !is.na(favor_us1)) |>
+  filter(!favor_us1 %in% c("Don't know", "Does not answer")) |>
+  count(party1, favor_us1) |>
+  ggplot(aes(x = favor_us1, y = n, fill = party1)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c(
+    "Government" = "#009C3B",
+    "Opposition" = "#002776"
+  )) +
+  labs(
+    title = "Opinion of the US",
+    y = "Number of Respondents",
+    fill = "Party"
+  ) +
+  theme_light() +
+  theme(
+      plot.title = element_text(
+        size = 14,
+        face = "bold",
+        hjust = 0.5,
+        color = "#002776"),
+      plot.caption = element_text(size = 11),
+      panel.grid.major.y = element_line(color = "gray90"),
+      panel.grid.major.x = element_blank(),
+      axis.line = element_line(color = "#002776"),
+      axis.text = element_text(color = "#002776", size = 11),
+      axis.title = element_text(
+        color = "#002776",
+        face = "bold",
+        size = 13),
+      strip.background = element_rect(fill = "#002776"),
+      strip.text = element_text(
+        color = "white",
+        face = "bold",
+        size = 11))
+
+plot_party_china <- brazil |>
+  filter(!is.na(party1), !is.na(favor_china1)) |>
+  filter(!favor_china1 %in% c("Don't know", "Does not answer")) |> 
+  count(party1, favor_china1) |>
+  ggplot(aes(x = favor_china1, y = n, fill = party1)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c(
+    "Government" = "#009C3B",
+    "Opposition" = "#002776"
+  )) +
+  labs(
+    title = "Opinion of China",
+    y = "Number of Respondents",
+    fill = "Party"
+  ) +
+  theme_light() +
+  theme(
+      plot.title = element_text(
+        size = 14,
+        face = "bold",
+        hjust = 0.5,
+        color = "#8B0000"),
+      plot.tag = element_text(
+        face = "bold",
+        size = 11,
+        hjust = 1,
+        vjust = 0,
+        color = "#8B0000"),
+      panel.grid.major.y = element_line(color = "gray90"),
+      panel.grid.major.x = element_blank(),
+      axis.line = element_line(color = "#8B0000"),
+      axis.text = element_text(color = "#8B0000", size = 11),
+      axis.title = element_text(
+        color = "#8B0000",
+        face = "bold",
+        size = 13),
+      strip.background = element_rect(fill = "#8B0000"),
+      strip.text = element_text(
+        color = "white",
+        face = "bold",
+        size = 11))
+
+plot_party_china + plot_party_us +
+  plot_layout(guides = "collect") +
+  plot_annotation(caption = "Source: Latinobarómetro 2023") &
+  theme(plot.margin = margin(t = 10, r = 10, b = 30, l = 10),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        theme(
+      plot.title = element_text(
+        size = 14,
+        face = "bold",
+        hjust = 0.5,
+        color = "#009C3B"),
+      plot.caption = element_text(size = 11),
+      panel.grid.major.y = element_line(color = "gray90"),
+      panel.grid.major.x = element_blank(),
+      axis.line = element_line(color = "#002776"),
+      axis.text = element_text(color = "#002776", size = 11),
+      axis.title = element_text(
+        color = "#002776",
+        face = "bold",
+        size = 13),
+      strip.background = element_rect(fill = "#009C3B"),
+      strip.text = element_text(
+        color = "white",
+        face = "bold",
+        size = 11)
+    )
+  )
+```
+# **Takeaways when Considering Partisanship**
+## *What do Different Voters Think of the Great Powers?*
+- Supporters of the Government Party (PT) have a slightly more favorable view of the United States than China
+  - They also have a more unfavorable view of China than the opposition
+- In proportion, government supporters have a similar level of support for both powers, but China has more respondents when accounting for an unfavorable opinion than the U.S.
+- The opposition party clearly has a more positive view of the U.S, proportionally
+  - In relation to China, there is some level of support, but there is a higher number of respondents with an unfavorable view of this great power
+
+#  
+### Proportionally, the highest difference is that the supporters of the government have a higher level of favorability to China than the opposition. 
+
+**What happens when respondents are forced to choose a power for Brazil to align with?**
+
+# **Should Brazil Get Closer to China or the US?**
+```{r}
+#| fig.width: 12
+#| fig.height: 6
+plot_closer <- brazil |>
+  filter(!is.na(party1), !is.na(closer_to1)) |>
+  filter(!closer_to %in% c("Don't know", "Does not answer")) |>
+  count(party1, closer_to1) |>
+  ggplot(aes(x = closer_to1, y = n, fill = party1)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c(
+    "Government" = "#009C3B",
+    "Opposition" = "#002776"
+  )) +
+  labs(
+    title = "Preferred Great Power",
+    y = "Number of Respondents",
+    fill = "Party",
+    caption = "Source: Latinobarómetro 2023"
+  ) +
+  theme_light() +
+  theme(
+      plot.title = element_text(
+        size = 20,
+        face = "bold",
+        hjust = 0.5,
+        color = "#009C3B"),
+      plot.tag = element_text(
+        face = "bold",
+        size = 11,
+        hjust = 1,
+        vjust = 0,
+        color = "#002776"),
+      panel.grid.major.y = element_line(color = "gray90"),
+      panel.grid.major.x = element_blank(),
+      axis.line = element_line(color = "#002776"),
+      axis.text = element_text(color = "#002776", size = 11),
+      axis.title = element_text(
+        color = "#002776",
+        face = "bold",
+        size = 13),
+      strip.background = element_rect(fill = "#009C3B"),
+      strip.text = element_text(
+        color = "white",
+        face = "bold",
+        size = 11),
+      axis.title.x = element_blank(),
+      plot.margin = margin(t = 10, r = 10, b = 10, l = 10))
+
+plot_closer
+```
+# **Who do Brazilians Choose to Align with?**
+## **Align with the United States!**
+- When accounting for partisanship, both sets of respondents proportionally favored the United States before China
+  - Government supporters had more respondents favoring China, but still a majority choosing the United States over China
+
+# **Conclusion**
+- The overview indicated that Brazilians generally have favorable views of the United States and China, but more unfavorable views of China than the United States
+- Considering partisanship, voters generally preferred an alignment with the United States before China, if they had to choose, but there were some differences among parties:
+
+### Answer to initial Research Question:
+> **Partisanship is correlated with Brazilian's views on foreign policy attitudes. Opposition voters consistently favored alignment with the U.S, while government supporters showed relatively more openness to China**
+
+# **What to Expect of Brazil in the Future?**
+### How is this relevant now?
+- Given the importance of foreign policy, the upcoming presidential elections in **October 2026** will be crucial for determining Brazil's future internationally.
+- **Lula's reelection** could determine a deepening alliance with China and a gradual shift of the balance of power in China's favor
+- A victory from the opposition could result in a deepening alliance with the United States, which would maintain the U.S's hegemony in the Western Hemisphere
+- Either outcome will have serious consequences not only for Brazil, but also to the broader **geopolitical competition** between the U.S and China in Latin America
