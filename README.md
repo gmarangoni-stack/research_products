@@ -38,8 +38,10 @@ Brazilian population towards Foreign Policy, specifically in attitudes towards
 United States and China?*"
 
 The data used was extracted directly from the  Latinobarómetro data publication for the 2023 wave.
-You may access the data in the following link: https://www.latinobarometro.org/latinobarometro-2023
-The data and codebook are also included in the repository.
+You may access the data in the following link: https://www.latinobarometro.org/latinobarometro-2023.
+The data and codebook are also included in the repository:
+- Data: Latinobarometro_2023_Brazil.xlsx
+- Codebook: Codebook Latinobarometro 2023.pdf
 
 I used several questions present in the Latinobarómetro survey from 2023, 
 including questions in relation to:
@@ -79,7 +81,7 @@ I examined the relationship to determine if "A"" students are relatively the mor
 
 The data extracted was from the Student Performance Dataset, in kaggle. The link to the dataset
 can be accessed through the following link: https://www.kaggle.com/datasets/kundanbedmutha/student-performance-dataset.
-The data can also be found in the repository. 
+The data can also be found in the repository: student_performance_data.csv 
 
 My approach was to create a plot and include diverse responses in the graph as different 
 points and analyze the amount of hours that "A" students dedicated to studying. Also, 
