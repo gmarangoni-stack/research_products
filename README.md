@@ -3,7 +3,7 @@ In this repository, I have included two original research products I elaborated 
 You may find the end products, the methodology, the reproducible code, and the replication files.
 The instructions for each product are down below:
 
-## Slide Deck (index.pdf)
+## Slide Deck (brazil_foreign_policy_attitudes.pdf)
 ### For this assignment, I had the following instructions:
 
 **Show off your data analytic research skills** 
