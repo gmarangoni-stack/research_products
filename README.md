@@ -32,14 +32,14 @@ Someone who encounters it should see that you took care in preparing it and shou
 be able to learn something concrete from your analytic insights
 
 ### Methodology
-The data used was extracted directly from the  Latinobarómetro data publication for the 2023 wave.
-You may access the data in the following link: https://www.latinobarometro.org/latinobarometro-2023
-The data and codebook are also included in the repository.
-
 This study aimed to analyze the question: 
 "To what extent does partisanship and presidential approval shape the view of the
 Brazilian population towards Foreign Policy, specifically in attitudes towards
 United States and China?*"
+
+The data used was extracted directly from the  Latinobarómetro data publication for the 2023 wave.
+You may access the data in the following link: https://www.latinobarometro.org/latinobarometro-2023
+The data and codebook are also included in the repository.
 
 I used several questions present in the Latinobarómetro survey from 2023, 
 including questions in relation to:
